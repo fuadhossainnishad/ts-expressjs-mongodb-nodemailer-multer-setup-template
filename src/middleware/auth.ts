@@ -8,7 +8,7 @@ import { AdminPayload, AuthPayload, UserPayload } from '../types/express';
 import { isExists } from 'date-fns';
 import { idConverter } from '../utility/idCoverter';
 
-const auth = (...requireRoles: UserRole[]) => {
+const auth = (...requireRoles: string[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     console.log('Authorization Header:', authHeader);
@@ -24,10 +24,9 @@ const auth = (...requireRoles: UserRole[]) => {
 
     let decoded: UserPayload | AdminPayload;
     try {
-      decoded = jwt.verify(
-        token,
-        config.jwt_access_secret as string,
-      ) as UserPayload | AdminPayload;
+      decoded = jwt.verify(token, config.jwt_access_secret as string) as
+        | UserPayload
+        | AdminPayload;
     } catch {
       throw new AppError(
         httpStatus.UNAUTHORIZED,
@@ -44,16 +43,20 @@ const auth = (...requireRoles: UserRole[]) => {
     }
     console.log('Decoded Token:', decoded);
 
-    let isUserExist = await User.findOne({ _id: await idConverter(id), email }).lean();
-    if (!isUserExist && role === USER_ROLE.ADMIN) {
-      isUserExist = await Admin.findOne({ _id: await idConverter(id), email });
+    const Model = roleModels[role];
+    if (!Model) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Role not supported', '');
     }
 
+    let isUserExist = await Model.findOne({
+      _id: await idConverter(id),
+      email,
+    }).lean();
+
     if (!isUserExist) {
-      console.log('No user/admin found for id:', id, 'email:', email);
-      throw new AppError(httpStatus.NOT_FOUND, 'User or Admin not found', '');
+      throw new AppError(httpStatus.NOT_FOUND, `${role} not found`, '');
     }
-    console.log("decode user:", isUserExist);
+    console.log('decode user:', isUserExist);
     req.user = isUserExist;
     next();
   });

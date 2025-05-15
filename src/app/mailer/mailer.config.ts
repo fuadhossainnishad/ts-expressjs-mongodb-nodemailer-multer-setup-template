@@ -1,5 +1,5 @@
-import nodemailer from "nodemailer";
-import config from "../config";
+import nodemailer from 'nodemailer';
+import config from '../config';
 
 export const transporter = nodemailer.createTransport({
   host: config.smtp_host,
@@ -16,8 +16,8 @@ export const transporter = nodemailer.createTransport({
 
 transporter.verify((error, success) => {
   if (error) {
-    console.error("Nodemailer connection error:", error);
+    console.error('Nodemailer connection error:', error);
   } else {
-    console.log("Nodemailer is ready to send emails 🚀");
+    console.log('Nodemailer is ready to send emails 🚀');
   }
 });

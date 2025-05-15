@@ -1,11 +1,11 @@
-import { MailOptions } from "nodemailer/lib/json-transport";
-import config from "../config";
-import { transporter } from "./mailer.config";
+import { MailOptions } from 'nodemailer/lib/json-transport';
+import config from '../config';
+import { transporter } from './mailer.config';
 
 export const sendMail = async (
   to: string,
   from: string,
-  html: string
+  html: string,
 ): Promise<void> => {
   const mailOptions = {
     from: config.smtp_user,
@@ -16,14 +16,14 @@ export const sendMail = async (
   try {
     await sendMailWithRetryLogic(mailOptions);
   } catch (error) {
-    console.error("Error sending email: ", error);
+    console.error('Error sending email: ', error);
   }
 };
 
 const sendMailWithRetryLogic = async (
   mailOptions: MailOptions,
   retries: number = 3,
-  delay: number = 1000
+  delay: number = 1000,
 ) => {
   let attempts = 0;
 
@@ -39,7 +39,7 @@ const sendMailWithRetryLogic = async (
       }
       console.error(
         `Attempt ${attempts} failed. Retrying in ${delay}ms...`,
-        error
+        error,
       );
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
