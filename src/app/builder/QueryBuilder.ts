@@ -1,6 +1,5 @@
 import { FilterQuery, Query, Model } from 'mongoose';
 
-
 class QueryBuilder<T> {
   public modelQuery: Query<T[], T>;
   public query: Record<string, unknown>;
@@ -18,7 +17,6 @@ class QueryBuilder<T> {
           [field]: { $regex: searchTerm, $options: 'i' },
         })),
       } as FilterQuery<T>);
-      
     }
     return this;
   }
@@ -32,17 +30,17 @@ class QueryBuilder<T> {
   }
 
   sort() {
-    const sort = (this?.query?.sort as string)?.split(',').join(' '); 
+    const sort = (this?.query?.sort as string)?.split(',').join(' ');
     if (sort) {
       this.modelQuery = this.modelQuery.sort(sort);
     } else {
-      this.modelQuery = this.modelQuery.sort('-createdAt'); 
+      this.modelQuery = this.modelQuery.sort('-createdAt');
     }
     return this;
   }
 
   pagination() {
-    let limit = 10; 
+    let limit = 10;
     let page = 1;
     let skip = 0;
 
@@ -83,4 +81,4 @@ class QueryBuilder<T> {
   }
 }
 
-export default QueryBuilder
+export default QueryBuilder;
