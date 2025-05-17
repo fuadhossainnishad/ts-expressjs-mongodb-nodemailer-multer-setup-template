@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import config from './app/config';
 import cookieParser from 'cookie-parser';
 import notFound from './middleware/notFound';
-import globalErrorHandler from './middleware/globalErrorHandelar';
+import globalErrorHandler from './middleware/globalErrorHandler';
 
 const app = express();
 

@@ -12,21 +12,31 @@ const validationRequest = (schema: AnyZodObject) => {
 
       // Parse JSON string in req.body.data if it exists
       if (!req.body.data) {
-        throw new AppError(httpStatus.BAD_REQUEST, 'Missing "data" field in request body', '');
+        throw new AppError(
+          httpStatus.BAD_REQUEST,
+          'Missing "data" field in request body',
+          '',
+        );
       }
       if (typeof req.body.data === 'string') {
         try {
           req.body.data = JSON.parse(req.body.data);
           console.log('validationRequest - After Parse:', req.body.data);
         } catch (error) {
-          throw new AppError(httpStatus.BAD_REQUEST, 'Invalid JSON format in data field', '');
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'Invalid JSON format in data field',
+            '',
+          );
         }
       }
 
       // Construct image object from req.files
       if (req.files) {
-        const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-        const imagePaths = files['image']?.map(file => file.path) || [];
+        const files = req.files as {
+          [fieldname: string]: Express.Multer.File[];
+        };
+        const imagePaths = files['image']?.map((file) => file.path) || [];
         const thumbnailPath = files['thumbnail']?.[0]?.path || '';
         req.body.image = {
           images: imagePaths,
@@ -43,10 +53,19 @@ const validationRequest = (schema: AnyZodObject) => {
         },
         cookies: req.cookies,
       });
-      console.log('validationRequest - Parsed Body:', { data: req.body.data, image: req.body.image });
+      console.log('validationRequest - Parsed Body:', {
+        data: req.body.data,
+        image: req.body.image,
+      });
       next();
     } catch (error) {
-      next(new AppError(httpStatus.BAD_REQUEST, 'Zod Validation error', error as any));
+      next(
+        new AppError(
+          httpStatus.BAD_REQUEST,
+          'Zod Validation error',
+          error as any,
+        ),
+      );
     }
   });
 };
