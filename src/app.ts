@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import router from './router';
 import helmet from 'helmet';
@@ -6,13 +6,30 @@ import config from './app/config';
 import cookieParser from 'cookie-parser';
 import notFound from './middleware/notFound';
 import globalErrorHandler from './middleware/globalErrorHandler';
+import rateLimit from 'express-rate-limit';
+import status from 'http-status';
 
 const app = express();
 
+const rateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    status: false,
+    message: 'Too many requests, please try again later',
+  },
+});
+
 app.use(helmet());
+
+app.use('/api', rateLimiter);
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(
   cors({
     origin: process.env.NODE_ENV === 'production' ? config.domain! : '*',
@@ -21,10 +38,10 @@ app.use(
 
 app.use('/src/uploads', express.static('src/uploads'));
 
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
   res.send({
     status: true,
-    message: 'Well Come To Setup Template',
+    message: 'Welcome To Setup Template',
   });
 });
 
